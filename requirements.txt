@@ -1,0 +1,10 @@
+zarr
+hdbscan
+umap-learn
+networkx
+tqdm
+torch 
+esm
+faiss-cpu
+pandas
+scikit-learn
