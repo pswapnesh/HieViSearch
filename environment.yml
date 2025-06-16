@@ -1,0 +1,21 @@
+name: hievi
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - zarr
+  - hdbscan
+  - umap-learn
+  - networkx
+  - tqdm
+  - faiss-cpu
+  - pandas
+  - scikit-learn
+  - prodigal
+  - biopython 
+  - pip
+  - pip:
+      - torch
+      - git+https://github.com/facebookresearch/esm.git

@@ -39,8 +39,8 @@ def main(args):
     embeddings = process_multifasta(args.query_fasta_path,args.output_folder,esm_model)
 
     # open the query vectors    
-    query_phage_ids = [emb["accessions"] for emb in embeddings]
-    query_mprs = [emb["embedding"] for emb in embeddings]
+    query_phage_ids = [emb["accession"] for emb in embeddings]
+    query_mprs = np.array([emb["embedding"] for emb in embeddings])
 
     number_of_queries = len(query_mprs)
 
@@ -57,7 +57,7 @@ def main(args):
     index = faiss.read_index(args.faiss_index_path)
     knn = args.k_neighbours
     first_nearest_distances, first_nearest_indices = index.search(query_mprs, knn)        
-    first_nearest_accessions = [[metadata(i) for i in indices] for indices in first_nearest_indices]    
+    first_nearest_accessions = [[metadata[str(i)] for i in indices] for indices in first_nearest_indices]    
     
     nearest_df = pd.concat([pd.DataFrame({"query_accession":[d['accession']]*knn,"nearest_accession":first_nearest_accessions[i]}) for i,d in enumerate(embeddings)])
     nearest_df.to_csv(os.path.join(args.output_folder,"HieVi_nearest_accessions.csv"))
@@ -65,18 +65,22 @@ def main(args):
     first_nearest_means = np.array([np.mean(np.array([index.reconstruct(int(idx)) for idx in indices]),axis = 0) for indices in first_nearest_indices])
     distances, indices = index.search(first_nearest_means, 256)
     unique_indices = np.unique(np.ravel(indices))
+    print(f"Nearest neighbor search completed. Found {len(unique_indices)} unique neighbors.")
     
 
     emb_db = np.array([index.reconstruct(int(idx)) for idx in unique_indices])
-    acc_db = [metadata(i) for i in unique_indices]
+    acc_db = [metadata[str(i)]  for i in unique_indices]
     
     all_emb = np.concatenate((emb_db,query_mprs),axis = 0)
 
-    acc_df = pd.DataFrame("accession":acc_db+list(query_phage_ids))
+    acc_df = pd.DataFrame({"accession":acc_db+list(query_phage_ids)})
+    
+    print("Running density clustering")
     distances = euclidean_distances(all_emb).astype('float')
     clusterer = hdbscan.HDBSCAN(min_cluster_size = 2,n_jobs = -1,min_samples = 1,allow_single_cluster = False,cluster_selection_method = "leaf",metric = 'precomputed',gen_min_span_tree=True)
     clusterer.fit(distances)
 
+    print("Making tree")
     G = make_network(clusterer,acc_df,min_lambda = -1)
     nx.write_gexf(G,os.path.join(args.output_folder,'network.gexf'))
 
@@ -84,14 +88,9 @@ def main(args):
 
 
     # for the density graph 
-
-
-
-    indices = np.unique(np.ravel(indices))
-    print(f"Nearest neighbor search completed. Found {len(indices)} unique neighbors.")
     
 
-
-
-    
-
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()  # NOT sys.argv[1:] manually
+    main(args)

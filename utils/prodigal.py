@@ -6,7 +6,7 @@ from Bio import SeqIO
 from tqdm import tqdm
 import numpy as np
 
-def process_multifasta(multifasta_path,esm_model,output_folder):
+def process_multifasta(multifasta_path,output_folder,esm_model):
     # Ensure output folder exists
     os.makedirs(output_folder, exist_ok=True)
     embeddings = []
@@ -29,7 +29,7 @@ def process_multifasta(multifasta_path,esm_model,output_folder):
         # Predict embeddings
         embedding = esm_model.predict_proteome(cleaned_protein_fasta)
         np.save(os.path.join(seq_folder,"embedding.npy"),embedding)
-        embeddings.append([{"accession": seq_name,"embedding":embedding}])
+        embeddings.append({"accession": seq_name,"embedding":embedding})
     return embeddings
 
 
@@ -50,12 +50,14 @@ def predict_genes_prodigal(fasta_string,seq_folder):
         sequence = str(record.seq)
         sequence_id = record.id or "sequence"
     except Exception as e:
-        return f"Error parsing FASTA string: {str(e)}", None
+        return f"Error parsing FASTA string: {str(e)}"
 
     # Create a temporary directory
     temp_dir = seq_folder
     temp_input_path = os.path.join(temp_dir, "input.fna")
-    temp_output_path = os.path.join(temp_dir, "output.faa")
+    temp_output_path = os.path.join(temp_dir, "proteins.faa")
+    temp_genes_path = os.path.join(temp_dir, "genes.fna")
+    temp_annotations_path = os.path.join(temp_dir,"annotations.gbk")
 
     # Write the input FASTA to a file in the temporary directory
     with open(temp_input_path, 'w') as temp_input:
@@ -64,14 +66,14 @@ def predict_genes_prodigal(fasta_string,seq_folder):
     # Run Prodigal via subprocess
     try:
         result = subprocess.run(
-            ['prodigal', '-i', temp_input_path, '-a', temp_output_path, '-p', 'single'],
+            ['prodigal', '-i', temp_input_path, '-a', temp_output_path, '-d', temp_genes_path, '-o', temp_annotations_path, '-p', 'meta'],
             capture_output=True, text=True, check=True
         )
     except subprocess.CalledProcessError as e:
         # DO NOT unlink here.  The user wants the temp dir.
         # os.unlink(temp_input_path)
         # os.unlink(temp_output_path)
-        return f"Error running Prodigal: {e.stderr}", None
+        return f"Error running Prodigal: {e.stderr}"
 
     # Read Prodigal output
     try:
@@ -81,10 +83,10 @@ def predict_genes_prodigal(fasta_string,seq_folder):
         # DO NOT unlink here.  The user wants the temp dir.
         # os.unlink(temp_input_path)
         # os.unlink(temp_output_path)
-        return f"Error reading Prodigal output: {str(e)}", None
+        return f"Error reading Prodigal output: {str(e)}"
 
     if not protein_fasta.strip():
-        return "No proteins predicted.", temp_dir # Return the path even if no proteins
+        return "No proteins predicted." # Return the path even if no proteins
 
     # Process the output to remove '*' (stop codons)
     cleaned_fasta = []
@@ -100,6 +102,6 @@ def predict_genes_prodigal(fasta_string,seq_folder):
 
     cleaned_protein_fasta = "\n".join(cleaned_fasta)
 
-    return cleaned_protein_fasta, temp_dir
+    return cleaned_protein_fasta
 
 

@@ -14,9 +14,9 @@ class EsmEmbedding:
         """
         # Load model and define layers based on the version
         model_map = {
-            "650m": (esm.pretrained.esm2_t33_650M_UR50D, [-1]),
-            "3b": (esm.pretrained.esm2_t36_3B_UR50D, [-1]),
-            "default": (esm.pretrained.esm2_t36_3B_UR50D, [-1]),
+            "650m": (esm.pretrained.esm2_t33_650M_UR50D, [33]),
+            "3b": (esm.pretrained.esm2_t36_3B_UR50D, [36]),
+            "default": (esm.pretrained.esm2_t36_3B_UR50D, [36]),
         }
 
         self.device = "cuda"
@@ -87,7 +87,7 @@ class EsmEmbedding:
         # Process all sequences within this single GPU context
         for prot_id, sequence in protein_sequences.items():
             # Use the helper method directly - no GPU context switch
-            mean_embedding,_ = self.predict([('name':sequence)])
+            mean_embedding,_ = self.predict([('name',sequence)])
             embeddings.append(mean_embedding)
     
         # Stack embeddings and normalize
