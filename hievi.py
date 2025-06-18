@@ -73,24 +73,35 @@ def main(args):
     
     all_emb = np.concatenate((emb_db,query_mprs),axis = 0)
 
-    acc_df = pd.DataFrame({"accession":acc_db+list(query_phage_ids)})
+    
     
     print("Running density clustering")
     distances = euclidean_distances(all_emb).astype('float')
     clusterer = hdbscan.HDBSCAN(min_cluster_size = 2,n_jobs = -1,min_samples = 1,allow_single_cluster = False,cluster_selection_method = "leaf",metric = 'precomputed',gen_min_span_tree=True)
     clusterer.fit(distances)
 
+    acc_df = pd.DataFrame({"accession":acc_db+list(query_phage_ids),"clust_id": clusterer.labels_})
+
     print("Making tree")
     G = make_network(clusterer,acc_df,min_lambda = -1)
-    nx.write_gexf(G,os.path.join(args.output_folder,'network.gexf'))
-
-    # save nearest neighbours in a single pandas. [query_accession, nearest_accession, distance]
-
-
-    # for the density graph 
+    G = convert_similarity_to_distance(G)
+    nearest_in_tree_df = []
+    graphs_list = []
+    for q,accs in zip(query_phage_ids,first_nearest_accessions):
+        subtree,nearest_in_tree = extract_weighted_subtree_around_accession(G,q,64,weight="distance")
+        graphs_list.append(subtree)
+        #nx.write_gexf(subtree,os.path.join(args.output_folder,q,'network.gexf'))
+        nearest_in_tree['query_accession'] = q
+        nearest_in_tree_df.append(nearest_in_tree)
+    nearest_in_tree_df = pd.concat(nearest_in_tree_df)        
+    G_full = merge_graphs(graphs_list)#merge_graphs_by_accession_safe(graphs_list)
+    nx.write_gexf(G_full,os.path.join(args.output_folder,'hievi_network.gexf'))
+    nearest_in_tree_df.to_csv(os.path.join(args.output_folder,args.experiment_name+'_nearest_in_tree.csv'))
     
 
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()  # NOT sys.argv[1:] manually
     main(args)
+
+

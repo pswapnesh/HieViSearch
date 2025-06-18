@@ -1,4 +1,4 @@
-# Hievi: 
+# Hievi
 
 Single 
 
@@ -7,7 +7,9 @@ https://huggingface.co/spaces/pswap/hievi
 ---
 
 
-##  Download dataset and faiss index
+## 📥 Download dataset and faiss index
+
+Download and save the two files in the same directory. 
 
 *Nearest neighbour index (Faiss index)*
 https://sdrive.cnrs.fr/s/kTJyFtzHNAg4t4f
