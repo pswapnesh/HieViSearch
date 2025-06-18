@@ -60,7 +60,7 @@ def main(args):
     first_nearest_accessions = [[metadata[str(i)] for i in indices] for indices in first_nearest_indices]    
     
     nearest_df = pd.concat([pd.DataFrame({"query_accession":[d['accession']]*knn,"nearest_accession":first_nearest_accessions[i]}) for i,d in enumerate(embeddings)])
-    nearest_df.to_csv(os.path.join(args.output_folder,"HieVi_nearest_accessions.csv"))
+    nearest_df.to_csv(os.path.join(args.output_folder,"nearest_neighbour_accessions.csv"))
     
     first_nearest_means = np.array([np.mean(np.array([index.reconstruct(int(idx)) for idx in indices]),axis = 0) for indices in first_nearest_indices])
     distances, indices = index.search(first_nearest_means, 256)
