@@ -28,6 +28,13 @@ conda env create -f environment.yml
 conda activate hievi
 ```
 
+Clone this project onto a local folder
+```bash
+cd your_folder
+git clone https://github.com/pswapnesh/HieViSearch.git
+```
+
+
 ## 🚀 Usage
 ```bash
 python hievi.py \
@@ -36,6 +43,8 @@ python hievi.py \
   --faiss_index_path path/to/faissbin.bin \
   --output_folder path/to/output
 ```
+## Expected execution time
+Apart from the model loading, which takes a few seconds. Each contig is processed in less 2 seconds per contig (of size ~ 30kbp) (GPU).
 
 ## 📂 Output
 The output is structured as bgiven below.
@@ -51,7 +60,10 @@ Output_Folder/
 ├── hievi_network.gexf
 ├── <experiment_name>_nearest_in_tree.csv
 └── nearest_neighbour_accessions.csv
-'''
+```
+
+## Visualization
+Cytoscape is recommended with gexf-app and yFiles Layout Algorithms.
 
 ## 📫 Cite
 Swapnesh Panigrahi, Mireille Ansaldi, Nicolas Ginet

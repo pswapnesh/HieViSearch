@@ -12,6 +12,7 @@ import json
 from sklearn.preprocessing import normalize
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 import hdbscan 
+from utils.prodigal import *
 
 esm_model = EsmEmbedding()
 
@@ -28,7 +29,6 @@ def get_argument_parser():
     return parser
 
 
-from utils.prodigal import *
 def main(args):
     """
     HieVi main function.
@@ -64,7 +64,8 @@ def main(args):
     
     first_nearest_means = np.array([np.mean(np.array([index.reconstruct(int(idx)) for idx in indices]),axis = 0) for indices in first_nearest_indices])
     distances, indices = index.search(first_nearest_means, 256)
-    unique_indices = np.unique(np.ravel(indices))
+    indices = list(np.ravel(first_nearest_indices)) + list(np.ravel(indices))
+    unique_indices = np.unique(np.array(indices))
     print(f"Nearest neighbor search completed. Found {len(unique_indices)} unique neighbors.")
     
 
@@ -73,7 +74,6 @@ def main(args):
     
     all_emb = np.concatenate((emb_db,query_mprs),axis = 0)
 
-    
     
     print("Running density clustering")
     distances = euclidean_distances(all_emb).astype('float')
@@ -85,19 +85,30 @@ def main(args):
     print("Making tree")
     G = make_network(clusterer,acc_df,min_lambda = -1)
     G = convert_similarity_to_distance(G)
+
+    # Accession → node
+    accession_to_node = {
+        data["accession"]: node for node, data in G.nodes(data=True) if "accession" in data
+    }
+    isleaf = {node: True if G.out_degree(node) == 0 else False for node in G.nodes()}
+
+
     nearest_in_tree_df = []
-    graphs_list = []
+    graphs_list = []    
+    nx.write_gexf(G,os.path.join(args.output_folder,'full.gexf'))
     for q,accs in zip(query_phage_ids,first_nearest_accessions):
-        subtree,nearest_in_tree = extract_weighted_subtree_around_accession(G,q,64,weight="distance")
+        subtree = get_local_nodes(G,isleaf,accession_to_node[q],depth = 2)
+        nearest_in_tree = pd.DataFrame({'query_accession':[q]*len(accs),"accession":accs})
         graphs_list.append(subtree)
-        #nx.write_gexf(subtree,os.path.join(args.output_folder,q,'network.gexf'))
-        nearest_in_tree['query_accession'] = q
+        #nx.write_gexf(subtree,os.path.join(args.output_folder,q,'network.gexf'))        
         nearest_in_tree_df.append(nearest_in_tree)
+
     nearest_in_tree_df = pd.concat(nearest_in_tree_df)        
-    G_full = merge_graphs(graphs_list)#merge_graphs_by_accession_safe(graphs_list)
+    G_full = merge_graphs(graphs_list) #merge_graphs_by_accession_safe(graphs_list)
     nx.write_gexf(G_full,os.path.join(args.output_folder,'hievi_network.gexf'))
     nearest_in_tree_df.to_csv(os.path.join(args.output_folder,args.experiment_name+'_nearest_in_tree.csv'))
-    
+    pd.DataFrame({"accession":acc_db}).to_csv(os.path.join(args.output_folder,'relevant_accessions.csv'))
+
 
 if __name__ == "__main__":
     parser = get_argument_parser()

@@ -127,7 +127,7 @@ def convert_similarity_to_distance(graph: nx.Graph, similarity_attr: str = "weig
 def extract_weighted_subtree_around_accession(
     graph: nx.DiGraph,
     accession: str,
-    n: int,
+    n: int, cutoff:int = 2,
     weight: str = "weight"
 ) -> tuple[nx.DiGraph, pd.DataFrame]:
     """
@@ -159,16 +159,21 @@ def extract_weighted_subtree_around_accession(
 
     # Compute distances
     if weight is None:
-        path_lengths = nx.single_source_shortest_path_length(undirected, source_node)
+        path_lengths = nx.single_source_shortest_path_length(undirected, source_node,cutoff=cutoff)
     else:
-        path_lengths = nx.single_source_dijkstra_path_length(undirected, source_node, weight=weight)
+        path_lengths = nx.single_source_dijkstra_path_length(undirected, source_node, weight=weight,cutoff=cutoff)
 
     # Sort by distance, select top N
     sorted_nodes = sorted(path_lengths.items(), key=lambda x: x[1])
     selected_nodes = [node for node, _ in sorted_nodes[:n]]
 
+    #selected_nodes = nx.single_source_shortest_path_length(undirected, source_node, cutoff=cutoff).keys()
+
+
     # Subgraph from original directed graph
-    subgraph = graph.subgraph(selected_nodes).copy()
+    #subgraph = graph.subgraph(selected_nodes).copy()
+
+    subgraph = get_local_topology(graph,source_node,max_depth = 3)
 
     # Create DataFrame of distances (excluding self)
     records = [
@@ -176,6 +181,7 @@ def extract_weighted_subtree_around_accession(
         for node, dist in sorted_nodes[1:n]  # Skip source node
         if node in node_to_accession
     ]
+    # Create DataFrame of distances (excluding self)
     df = pd.DataFrame(records)
 
     return subgraph, df
@@ -252,3 +258,67 @@ def merge_graphs(graph_list: list[nx.Graph]) -> nx.Graph:
                 combined.add_edge(u, v, **edge_attrs)
 
     return combined
+
+
+def get_subgraph_for_accessions(G, accessions):
+    """
+    Extracts the minimal subtree containing the found accessions.
+    Silently skips any accessions not found in the graph.
+
+    Parameters:
+        G (nx.DiGraph): Directed tree where some leaves have 'accession' attributes.
+        accessions (list): List of accession strings to include.
+
+    Returns:
+        nx.DiGraph: Subgraph connecting all found accessions to root.
+    """
+    # Map accession → node
+    acc_to_node = {
+        data["accession"]: n
+        for n, data in G.nodes(data=True)
+        if "accession" in data
+    }
+
+    # Keep only accessions that are found
+    nodes = [acc_to_node[acc] for acc in accessions if acc in acc_to_node]
+    if not nodes:
+        return G.subgraph([]).copy()  # Return empty graph
+
+    # Collect all paths from each node to root
+    nodes_in_subtree = set()
+    for node in nodes:
+        while True:
+            nodes_in_subtree.add(node)
+            preds = list(G.predecessors(node))
+            if not preds:
+                break  # reached root
+            node = preds[0]
+
+    return G.subgraph(nodes_in_subtree).copy()
+
+def get_successors(G,isleaf,predecessor):
+    if isleaf.get(predecessor):
+        return [predecessor]
+    successors = list(G.successors(predecessor))    
+    #leaves = [isleaf.get(n) for n in successors]
+    return successors
+
+def get_local_nodes(G,isleaf,source_node,depth=2):
+
+    current = source_node
+    for i in range(depth):        
+        predecessors = list(G.predecessors(current))
+        if not predecessors:
+            #raise ValueError(f"Node '{current}' does not have enough ancestors.")
+            break
+        predecessor = predecessors[0]
+        current = predecessor
+    
+    successors = get_successors(G,isleaf,current)
+    all_nodes = [current] + list(np.ravel(np.array(successors)))
+    for i in range(2*depth):
+        tmp = [a for s in successors for a in get_successors(G,isleaf,s)] 
+        all_nodes += tmp
+        successors = tmp
+    all_nodes = np.unique(np.array(all_nodes))
+    return G.subgraph(all_nodes).copy()
