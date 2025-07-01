@@ -27,9 +27,10 @@ def process_multifasta(multifasta_path,output_folder,esm_model):
         cleaned_protein_fasta = predict_genes_prodigal(fasta_string, seq_folder)
 
         # Predict embeddings
-        embedding = esm_model.predict_proteome(cleaned_protein_fasta)
+        embeddings_all = esm_model.predict_proteome(cleaned_protein_fasta)
+        embedding = np.mean(embeddings_all, axis=0)
         np.save(os.path.join(seq_folder,"embedding.npy"),embedding)
-        embeddings.append({"accession": seq_name,"embedding":embedding})
+        embeddings.append({"accession": seq_name,"embedding":embedding,"embeddings_all":embeddings_all})
     return embeddings
 
 

@@ -13,6 +13,7 @@ from sklearn.preprocessing import normalize
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 import hdbscan 
 from utils.prodigal import *
+from scipy.spatial.distance import cdist
 
 esm_model = EsmEmbedding()
 
@@ -26,6 +27,7 @@ def get_argument_parser():
     parser.add_argument("--faiss_index_path", type=str, required=True, help="Path to FAISS index.")
     parser.add_argument("--output_folder", type=str, required=True, help="Output folder path.")
     parser.add_argument("--k_neighbours", type=int, default=16, help="Number of neighbors for FAISS search.")    
+    parser.add_argument("--depth", type=int, default=3, help="Number of neighbors for FAISS search.")    
     return parser
 
 
@@ -56,14 +58,27 @@ def main(args):
 
     index = faiss.read_index(args.faiss_index_path)
     knn = args.k_neighbours
+
     first_nearest_distances, first_nearest_indices = index.search(query_mprs, knn)        
     first_nearest_accessions = [[metadata[str(i)] for i in indices] for indices in first_nearest_indices]    
     
     nearest_df = pd.concat([pd.DataFrame({"query_accession":[d['accession']]*knn,"nearest_accession":first_nearest_accessions[i]}) for i,d in enumerate(embeddings)])
     nearest_df.to_csv(os.path.join(args.output_folder,"nearest_neighbour_accessions.csv"))
+
     
+    #first_nearest_vectors = np.array([np.array([index.reconstruct(int(idx)) for idx in indices]) for indices in first_nearest_indices])
+    #first_nearest_means = np.mean(first_nearest_vectors,axis = 1)
+
     first_nearest_means = np.array([np.mean(np.array([index.reconstruct(int(idx)) for idx in indices]),axis = 0) for indices in first_nearest_indices])
     distances, indices = index.search(first_nearest_means, 256)
+
+    # for core genes
+    core_genes = []
+    for emb,v in zip(embeddings,first_nearest_means):                
+        tmp = np.mean(cdist(np.array([v]),emb["embeddings_all"]),axis = 0)
+        core_genes.append({"accession":emb["accession"],"core":tmp,"order":np.argsort(tmp)})
+    pd.DataFrame(core_genes).to_csv(os.path.join(args.output_folder,"possible_core_genes.csv"))
+
     indices = list(np.ravel(first_nearest_indices)) + list(np.ravel(indices))
     unique_indices = np.unique(np.array(indices))
     print(f"Nearest neighbor search completed. Found {len(unique_indices)} unique neighbors.")
@@ -97,9 +112,11 @@ def main(args):
     graphs_list = []    
     nx.write_gexf(G,os.path.join(args.output_folder,'full.gexf'))
     for q,accs in zip(query_phage_ids,first_nearest_accessions):
-        subtree = get_local_nodes(G,isleaf,accession_to_node[q],depth = 2)
+        subtree = get_local_nodes(G,isleaf,accession_to_node[q],depth = args.depth)
         nearest_in_tree = pd.DataFrame({'query_accession':[q]*len(accs),"accession":accs})
-        graphs_list.append(subtree)
+        graphs_list.append(subtree)        
+        with open(os.path.join(args.output_folder,q,'tree.newick'),"w") as f:
+            f.write(graph_to_newick(subtree))
         #nx.write_gexf(subtree,os.path.join(args.output_folder,q,'network.gexf'))        
         nearest_in_tree_df.append(nearest_in_tree)
 

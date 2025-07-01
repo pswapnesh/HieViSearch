@@ -93,6 +93,7 @@ class EsmEmbedding:
         # Stack embeddings and normalize
         embeddings_stack = torch.stack(embeddings, dim=0).to(torch.float64)
         embeddings_stack = torch.nn.functional.normalize(embeddings_stack, p=2, dim=1)
-        embeddings_mean = torch.mean(embeddings_stack, dim=0)
+        return embeddings_stack.cpu().numpy()
+        #embeddings_mean = torch.mean(embeddings_stack, dim=0)
     
-        return embeddings_mean.cpu().numpy()  # Move to CPU and convert to numpy
+        #return embeddings_mean.cpu().numpy()  # Move to CPU and convert to numpy

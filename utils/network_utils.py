@@ -111,8 +111,6 @@ def graph_to_newick(graph: nx.DiGraph) -> str:
     return newick_str
 
 
-import networkx as nx
-
 def convert_similarity_to_distance(graph: nx.Graph, similarity_attr: str = "weight") -> nx.Graph:
     """
     Returns a copy of the graph where edge weights are inverted: distance = 1 / similarity.
@@ -124,70 +122,8 @@ def convert_similarity_to_distance(graph: nx.Graph, similarity_attr: str = "weig
         data["distance"] = 1.0 / sim if sim > 0 else float("inf")
     return g
 
-def extract_weighted_subtree_around_accession(
-    graph: nx.DiGraph,
-    accession: str,
-    n: int, cutoff:int = 2,
-    weight: str = "weight"
-) -> tuple[nx.DiGraph, pd.DataFrame]:
-    """
-    Extract a subtree of the n closest nodes around a given node identified by 'accession',
-    and return a DataFrame of nearby accessions and distances.
 
-    Parameters:
-    - graph: NetworkX DiGraph
-    - accession: Accession string (center node)
-    - n: Number of closest nodes to include (including source)
-    - weight: Edge attribute to use for distance (None for unweighted)
-
-    Returns:
-    - subgraph: Directed subgraph (nx.DiGraph)
-    - df: pandas DataFrame with columns ['accession', 'distance'], excluding source
-    """
-    # Accession → node
-    accession_to_node = {
-        data["accession"]: node for node, data in graph.nodes(data=True) if "accession" in data
-    }
-    node_to_accession = {v: k for k, v in accession_to_node.items()}
-
-    source_node = accession_to_node.get(accession)
-    if source_node is None:
-        raise ValueError(f"Accession '{accession}' not found in graph.")
-
-    # Undirected for symmetric path search
-    undirected = graph.to_undirected()
-
-    # Compute distances
-    if weight is None:
-        path_lengths = nx.single_source_shortest_path_length(undirected, source_node,cutoff=cutoff)
-    else:
-        path_lengths = nx.single_source_dijkstra_path_length(undirected, source_node, weight=weight,cutoff=cutoff)
-
-    # Sort by distance, select top N
-    sorted_nodes = sorted(path_lengths.items(), key=lambda x: x[1])
-    selected_nodes = [node for node, _ in sorted_nodes[:n]]
-
-    #selected_nodes = nx.single_source_shortest_path_length(undirected, source_node, cutoff=cutoff).keys()
-
-
-    # Subgraph from original directed graph
-    #subgraph = graph.subgraph(selected_nodes).copy()
-
-    subgraph = get_local_topology(graph,source_node,max_depth = 3)
-
-    # Create DataFrame of distances (excluding self)
-    records = [
-        {"accession": node_to_accession[node], "distance": dist}
-        for node, dist in sorted_nodes[1:n]  # Skip source node
-        if node in node_to_accession
-    ]
-    # Create DataFrame of distances (excluding self)
-    df = pd.DataFrame(records)
-
-    return subgraph, df
-
-
-def merge_graphs_by_accession_safe(graph_list: list[nx.Graph], accession_key: str = "accession") -> nx.Graph:
+def merge_graphs_by_accession_safe(graph_list, accession_key= "accession"):
     """
     Merges graphs by the 'accession' attribute. If a node lacks 'accession',
     it is assigned a fallback ID: f"{node_id}_{graph_index}" to ensure uniqueness.
@@ -229,7 +165,7 @@ def merge_graphs_by_accession_safe(graph_list: list[nx.Graph], accession_key: st
 
     return merged
 
-def merge_graphs(graph_list: list[nx.Graph]) -> nx.Graph:
+def merge_graphs(graph_list):
     """
     Merges a list of NetworkX graphs into a single graph.
     Nodes with the same ID are merged; attributes like 'accession' are preserved.
