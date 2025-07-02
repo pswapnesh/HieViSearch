@@ -1,6 +1,10 @@
 # Hievi
 
-Single 
+<iframe src="https://pswapnesh.github.io/HieVi/HieVi_UMAP.html" title="Phage atlas">
+</iframe>
+
+---
+Single genome comparision is available as a demo at 
 
 https://huggingface.co/spaces/pswap/hievi
 
@@ -43,6 +47,16 @@ python hievi.py \
   --faiss_index_path path/to/faissbin.bin \
   --output_folder path/to/output
 ```
+For only the nearese neighbours 
+```bash
+python hievi_search.py \
+  --experiment_name test \
+  --query_fasta_path test/test_contigs.fasta \
+  --faiss_index_path path/to/faissbin.bin \
+  --output_folder path/to/output
+  --k_neighbours 64
+```
+
 ## Expected execution time
 Apart from the model loading, which takes a few seconds. Each contig is processed in less 2 seconds per contig (of size ~ 30kbp) (GPU).
 
