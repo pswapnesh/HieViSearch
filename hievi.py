@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 import hdbscan 
 from utils.prodigal import *
 from scipy.spatial.distance import cdist
+from utils.plotter import *
 
 esm_model = EsmEmbedding()
 
@@ -62,7 +63,7 @@ def main(args):
     first_nearest_distances, first_nearest_indices = index.search(query_mprs, knn)        
     first_nearest_accessions = [[metadata[str(i)] for i in indices] for indices in first_nearest_indices]    
     
-    nearest_df = pd.concat([pd.DataFrame({"query_accession":[d['accession']]*knn,"nearest_accession":first_nearest_accessions[i]}) for i,d in enumerate(embeddings)])
+    nearest_df = pd.concat([pd.DataFrame({"query_accession":[d['accession']]*knn,"nearest_accession":first_nearest_accessions[i],"distance":first_nearest_distances[i]}) for i,d in enumerate(embeddings)])
     nearest_df.to_csv(os.path.join(args.output_folder,"nearest_neighbour_accessions.csv"))
 
     
@@ -72,12 +73,14 @@ def main(args):
     first_nearest_means = np.array([np.mean(np.array([index.reconstruct(int(idx)) for idx in indices]),axis = 0) for indices in first_nearest_indices])
     distances, indices = index.search(first_nearest_means, 256)
 
-    # for core genes
-    core_genes = []
-    for emb,v in zip(embeddings,first_nearest_means):                
-        tmp = np.mean(cdist(np.array([v]),emb["embeddings_all"]),axis = 0)
-        core_genes.append({"accession":emb["accession"],"core":tmp,"order":np.argsort(tmp)})
-    pd.DataFrame(core_genes).to_csv(os.path.join(args.output_folder,"possible_core_genes.csv"))
+    # # for core genes
+    # core_genes = []
+    # for emb,v in zip(embeddings,first_nearest_means):                
+    #     tmp = np.mean(cdist(np.array([v]),emb["embeddings_all"]),axis = 0)
+    #     core_genes.append({"accession":emb["accession"],"core":tmp,"order":np.argsort(tmp)})
+    #     seq_folder = os.path.join(args.output_folder, emb["accession"])
+    #     plot_genes_with_importance(os.path.join(seq_folder, "proteins.faa"), 1.0/tmp, output_image_path=os.path.join(seq_folder, "gene_map.png"))
+    # pd.DataFrame(core_genes).to_csv(os.path.join(args.output_folder,"possible_core_genes.csv"))
 
     indices = list(np.ravel(first_nearest_indices)) + list(np.ravel(indices))
     unique_indices = np.unique(np.array(indices))

@@ -29,7 +29,7 @@ def process_multifasta(multifasta_path,output_folder,esm_model):
         # Predict embeddings
         embeddings_all = esm_model.predict_proteome(cleaned_protein_fasta)
         embedding = np.mean(embeddings_all, axis=0)
-        np.save(os.path.join(seq_folder,"embedding.npy"),embedding)
+        np.save(os.path.join(seq_folder,"pembeddings.npy"),embeddings_all)
         embeddings.append({"accession": seq_name,"embedding":embedding,"embeddings_all":embeddings_all})
     return embeddings
 
