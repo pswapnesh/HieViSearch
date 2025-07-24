@@ -16,11 +16,10 @@ https://huggingface.co/spaces/pswap/hievi
 Download and save the two files in the same directory. 
 
 *Nearest neighbour index (Faiss index)*
-https://sdrive.cnrs.fr/s/kTJyFtzHNAg4t4f
+https://sdrive.cnrs.fr/s/TY5KMJx65bTqMYG
 
 *Metadata*
-https://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
-
+https://sdrive.cnrs.fr/s/RRGmSYCpTRJBDHz
 
 
 ## 🛠️ Installation
@@ -81,4 +80,6 @@ Cytoscape is recommended with gexf-app and yFiles Layout Algorithms.
 
 ## 📫 Cite
 Swapnesh Panigrahi, Mireille Ansaldi, Nicolas Ginet
-https://www.biorxiv.org/content/10.1101/2024.12.17.627486v1
+https://www.biorxiv.org/conthttps://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
+https://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
+ent/10.1101/2024.12.17.627486v1
