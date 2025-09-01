@@ -1,7 +1,7 @@
 # Hievi
 
-<iframe src="https://pswapnesh.github.io/HieVi/HieVi_UMAP.html" title="Phage atlas">
-</iframe>
+UMAP
+https://pswapnesh.github.io/HieVi/HieVi_UMAP.html
 
 ---
 Single genome comparision is available as a demo at 
@@ -17,10 +17,10 @@ Download and save the two files in the same directory.
 
 *Nearest neighbour index (Faiss index)*
 https://sdrive.cnrs.fr/s/TY5KMJx65bTqMYG
-
+https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_index.bin?download=1&preview=1
 *Metadata*
 https://sdrive.cnrs.fr/s/RRGmSYCpTRJBDHz
-
+https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_metadata.json?download=1&preview=1
 
 ## 🛠️ Installation
 
@@ -81,5 +81,3 @@ Cytoscape is recommended with gexf-app and yFiles Layout Algorithms.
 ## 📫 Cite
 Swapnesh Panigrahi, Mireille Ansaldi, Nicolas Ginet
 https://www.biorxiv.org/conthttps://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
-https://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
-ent/10.1101/2024.12.17.627486v1
