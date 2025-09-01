@@ -1,6 +1,6 @@
 # Hievi
 
-UMAP
+Interactive UMAP at
 https://pswapnesh.github.io/HieVi/HieVi_UMAP.html
 
 ---
@@ -17,11 +17,11 @@ Download and save the two files in the same directory.
 
 *Nearest neighbour index (Faiss index)*
 
-https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_index.bin?download=1&preview=1
+https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_index.bin?download=1
 
 *Metadata*
 
-https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_metadata.json?download=1&preview=1
+https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_metadata.json?download=1
 
 ## 🛠️ Installation
 
@@ -43,15 +43,15 @@ git clone https://github.com/pswapnesh/HieViSearch.git
 ```bash
 python hievi.py \
   --experiment_name test \
-  --query_fasta_path test/test_contigs.fasta \
+  --query_fasta_path test/test.fasta \
   --faiss_index_path path/to/faissbin.bin \
   --output_folder path/to/output
 ```
-For only the nearese neighbours 
+To output only the nearest neighbours of your genomes (relatively faster)
 ```bash
 python hievi_search.py \
   --experiment_name test \
-  --query_fasta_path test/test_contigs.fasta \
+  --query_fasta_path test/test.fasta \
   --faiss_index_path path/to/faissbin.bin \
   --output_folder path/to/output
   --k_neighbours 64
@@ -82,3 +82,5 @@ Cytoscape is recommended with gexf-app and yFiles Layout Algorithms.
 ## 📫 Cite
 Swapnesh Panigrahi, Mireille Ansaldi, Nicolas Ginet
 https://www.biorxiv.org/conthttps://sdrive.cnrs.fr/s/kBwgyYe6rwjmNgZ
+
+(accepted paper link, soon!)
