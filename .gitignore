@@ -1,2 +1,4 @@
 *.pyc
 test*.ipynb
+utils/__pycache__/
+test/test_contigs.fasta

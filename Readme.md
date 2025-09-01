@@ -16,10 +16,11 @@ https://huggingface.co/spaces/pswap/hievi
 Download and save the two files in the same directory. 
 
 *Nearest neighbour index (Faiss index)*
-https://sdrive.cnrs.fr/s/TY5KMJx65bTqMYG
+
 https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_index.bin?download=1&preview=1
+
 *Metadata*
-https://sdrive.cnrs.fr/s/RRGmSYCpTRJBDHz
+
 https://zenodo.org/records/17018992/files/Inphared_14Apr_float64_t36_meanCls_3b.zarr_faiss_metadata.json?download=1&preview=1
 
 ## 🛠️ Installation
