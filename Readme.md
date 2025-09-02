@@ -1,17 +1,21 @@
-# HieVi
-## Leveraging protein Language Models for bacteriophages comparative genomics
+# HieVi - Leveraging protein Language Models for bacteriophages comparative genomics
 ---
-Interactive UMAP at
+![HieVi Phage Atlas](HieVi_Phage_Atlas.png)
+2D visualisation (UMPA projection) of the embedding space comprising vector representations of 24,362 prokaryotic viral proteomes generated with HieVi. Viruses are colored by their annotated ICTV genus (unknown genera are plotted in orange).
+
+**This interactive UMAP can be browsed at:**
+
 https://pswapnesh.github.io/HieVi/HieVi_UMAP.html
 
 ---
-Single genome comparision is available as a demo at 
+## Online HieVi use-case for a single genome query
+
+Users can compare a single genome (DNA sequence in FASTA format) with the current HieVi database at:
 
 https://huggingface.co/spaces/pswap/hievi
 
 ---
-
-
+# HieVi pipeline installation
 ## 📥 Download dataset and faiss index
 
 Download and save the two files in the same directory. 
