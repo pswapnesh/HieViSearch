@@ -1,5 +1,8 @@
 # HieVi - Leveraging protein Language Models for bacteriophages comparative genomics
 ---
+Bacteriophages, viruses of bacteria, shape bacterial communities and offer promise to treat multidrug-resistant infections. Phage taxonomy is a daunting challenge due to their rapid evolution, frequent gene swapping, and ever-increasing volume of new genomes. We introduce HieVi (Hierarchical Viruses), a framework for comparative genomics of bacteriophages that leverages self-supervised protein Language Model (pLM) to generate a single vector representation for each phage proteome. This “fingerprint” encodes functional and evolving information that enables the organization of phage genomes in accordance with existing taxonomy and facilitates the discovery of new taxa. HieVi framework constitutes a step towards scalable and searchable organisation of phage genomic data useful for refining existing taxonomy and exploring the intricate and ever-expanding landscape of the viral world.
+
+---
 ![HieVi Phage Atlas](HieVi_Phage_Atlas.png)
 2D visualisation (UMAP projection) of the embedding space comprising vector representations of 24,362 prokaryotic viral proteomes generated with HieVi. Viruses are colored by their annotated ICTV genus (unknown genera are plotted in orange).
 
