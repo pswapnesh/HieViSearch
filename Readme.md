@@ -1,7 +1,7 @@
 # HieVi - Leveraging protein Language Models for bacteriophages comparative genomics
 ---
 ![HieVi Phage Atlas](HieVi_Phage_Atlas.png)
-2D visualisation (UMPA projection) of the embedding space comprising vector representations of 24,362 prokaryotic viral proteomes generated with HieVi. Viruses are colored by their annotated ICTV genus (unknown genera are plotted in orange).
+2D visualisation (UMAP projection) of the embedding space comprising vector representations of 24,362 prokaryotic viral proteomes generated with HieVi. Viruses are colored by their annotated ICTV genus (unknown genera are plotted in orange).
 
 **This interactive UMAP can be browsed at:**
 
