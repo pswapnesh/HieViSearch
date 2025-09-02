@@ -5,6 +5,9 @@ Bacteriophages, viruses of bacteria, shape bacterial communities and offer promi
 ---
 ![HieVi Phage Atlas](HieVi_Phage_Atlas.png)
 2D visualisation (UMAP projection) of the embedding space comprising vector representations of 24,362 prokaryotic viral proteomes generated with HieVi. Viruses are colored by their annotated ICTV genus (unknown genera are plotted in orange).
+<a href="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.png">
+  <img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.png" alt="Creative Commons License" width="50">
+</a>
 
 **This interactive UMAP can be browsed at:**
 
