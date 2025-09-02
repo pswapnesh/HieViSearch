@@ -66,10 +66,10 @@ python hievi_search.py \
 ```
 
 ## Expected execution time
-Apart from the model loading, which takes a few seconds. Each contig is processed in less 2 seconds per contig (of size ~ 30kbp) (GPU).
+Apart from the model loading, which takes a few seconds, each contig is processed in less 2 seconds per contig (of size ~ 30kbp) (GPU).
 
 ## 📂 Output
-The output is structured as bgiven below.
+The output is structured as given below.
 - ```nearest_neighbour_accessions.csv``` contains a table of the query accession and the k-nearest neighbour accessions in the database
 - ```experimentName_nearest_in_tree.csv``` contains the k-nearest accession in the condensed tree
 - ```hievi_network.gexf``` contains the combined tree of all the qery and relevant accessions in the database 
